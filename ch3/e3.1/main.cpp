@@ -1,3 +1,13 @@
+/*
+ * A common problem for compilers and text editors is determining whether the
+ * parentheses in a string are balanced and properly nested. For example, the
+ * string ((())())() contains properly nested pairs of parentheses, while the
+ * strings )()( and ()) do not. Give an algorithm that returns true if a string
+ * contains properly nested and balanced parentheses, and false if otherwise.
+ * For full credit, identify the position of the first offending parenthesis if
+ * the string is not properly nested and balanced.
+ */
+
 #include <exception>
 #include <iostream>
 #include <stack>
@@ -27,7 +37,8 @@ bool isBalanced(const string &str) {
   for (auto par : str) {
     if (openPars.find(par) != string::npos ||
         closePars.find(par) != string::npos)
-      ;
+      throw invalid_argument(
+          "ERROR: The string must contain only parentheses.");
     if (openPars.find(par) != string::npos) {
       S.push(par);
     } else {
