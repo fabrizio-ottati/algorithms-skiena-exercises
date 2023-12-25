@@ -1,5 +1,5 @@
+#include <exception>
 #include <iostream>
-#include <map>
 #include <stack>
 #include <string>
 
@@ -25,7 +25,10 @@ bool isBalanced(const string &str) {
   const string openPars{"{[("}, closePars{"}])"};
 
   for (auto par : str) {
-    if (openPars.find(par) != std::string::npos) {
+    if (openPars.find(par) != string::npos ||
+        closePars.find(par) != string::npos)
+      ;
+    if (openPars.find(par) != string::npos) {
       S.push(par);
     } else {
       if (S.empty()) {
