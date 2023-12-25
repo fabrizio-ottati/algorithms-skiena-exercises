@@ -62,11 +62,11 @@ template <typename T> class DumbVector : public Vector<T> {
 template <typename T> class SmartVector : public Vector<T> {
   void pop_back(void) {
     this->_size--;
-    // We shrink only if _size < _capacity / 4, so that we do not enlarge and
-    // shrink the vector when we perform multiple push_back and pop_back
-    // one after the other.
+    // We shrink only if _size < _capacity / 4, and we shrink by a factor of 2
+    // so that we do not enlarge and shrink the vector when we perform multiple
+    // push_back and pop_back one after the other.
     if (this->_size < this->_capacity / 4) {
-      this->_capacity /= 4;
+      this->_capacity /= 2;
       this->_data = (T *)realloc(this->_data, sizeof(T) * this->_capacity);
       if (this->_data == nullptr)
         throw runtime_error("ERROR: Could not shrink the vector.");
