@@ -44,17 +44,17 @@ void find_path_example(const string &fpath) {
   BFSInfo info;
   bfs(G, 1, info);
   // Finding the shortest path between two nodes.
-  vertex_t start = 1, end = 1;
+  vertex_t start = 1, end = 6;
   auto shortestPath = find_path(start, end, info.parents);
   cout << "Here's the shortest path between " << start << " and " << end << ":"
        << endl;
   for (auto i = 0; i < shortestPath.size(); i++) {
     if (i == shortestPath.size() - 1) {
-      cout << shortestPath[i] << "." << endl;
+      cout << " -- " << shortestPath[i] << "." << endl;
     } else if (i == 0) {
       cout << shortestPath[i];
     } else {
-      cout << " -- " << shortestPath[i] << " -- ";
+      cout << " -- " << shortestPath[i];
     }
   }
   return;

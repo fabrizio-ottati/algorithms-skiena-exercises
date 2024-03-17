@@ -14,12 +14,12 @@ constexpr vertex_t ROOT_VERTEX = -1;
 typedef struct edgenode {
   vertex_t y;
   int weight;
-} edgenode;
+} edgenode_t;
 
 // Data structure describing a Graph.
 // Based on adjacency list.
 struct Graph {
-  std::vector<std::list<edgenode>> edges;
+  std::vector<std::list<edgenode_t>> edges;
   std::vector<int> degree;
   int nvertices;
   int nedges;

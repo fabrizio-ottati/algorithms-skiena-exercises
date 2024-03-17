@@ -55,13 +55,13 @@ void read_graph(Graph &g, bool directed, const string &fpath, bool verbose) {
 void insert_edge(Graph &g, vertex_t x, vertex_t y, bool directed,
                  bool verbose) {
   // Initiliazing.
-  edgenode p;
+  edgenode_t p;
   p.weight = 0;
   p.y = y;
 
   // Checking if the vertex is already in the Graph.
   while (x >= g.edges.size()) {
-    list<edgenode> l;
+    list<edgenode_t> l;
     g.edges.push_back(l);
     g.degree.push_back(0);
   }
@@ -158,6 +158,11 @@ static void find_path_r(vector<vertex_t> &path, vertex_t start, vertex_t end,
 
 vector<vertex_t> find_path(vertex_t start, vertex_t end,
                            const vector<vertex_t> &parents) {
+  if (parents[start] != ROOT_VERTEX) {
+    cerr << "WARNING: The start vertex " << start << " is not a root one.\n"
+         << endl;
+  }
+
   vector<vertex_t> path;
   path.clear();
   find_path_r(path, start, end, parents);
