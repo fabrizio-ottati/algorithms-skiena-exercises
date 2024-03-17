@@ -3,12 +3,12 @@
 #include <exception>
 #include <fstream>
 #include <iostream>
-#include <sstream>
+#include <queue>
 #include <string>
 
 using namespace std;
 
-void initialize_graph(graph &g, bool directed, bool verbose) {
+void initialize_graph(Graph &g, bool directed, bool verbose) {
   g.nvertices = 0;
   g.nedges = 0;
   g.directed = directed;
@@ -21,7 +21,7 @@ void initialize_graph(graph &g, bool directed, bool verbose) {
   return;
 }
 
-void read_graph(graph &g, bool directed, const string &fpath, bool verbose) {
+void read_graph(Graph &g, bool directed, const string &fpath, bool verbose) {
   std::ifstream ifs(fpath);
   if (!ifs.is_open()) {
     throw runtime_error("ERROR: Could not open input file.");
@@ -34,7 +34,7 @@ void read_graph(graph &g, bool directed, const string &fpath, bool verbose) {
     throw runtime_error("ERROR: Could not read from file.");
   }
   if (verbose)
-    cout << "The graph contains " << g.nvertices << " vertices and " << m
+    cout << "The Graph contains " << g.nvertices << " vertices and " << m
          << " edges." << endl;
 
   for (auto i = 0; i < m; i++) {
@@ -51,13 +51,13 @@ void read_graph(graph &g, bool directed, const string &fpath, bool verbose) {
   return;
 }
 
-void insert_edge(graph &g, int x, int y, bool directed, bool verbose) {
+void insert_edge(Graph &g, int x, int y, bool directed, bool verbose) {
   // Initiliazing.
   edgenode p;
   p.weight = 0;
   p.y = y;
 
-  // Checking if the vertex is already in the graph.
+  // Checking if the vertex is already in the Graph.
   while (x >= g.edges.size()) {
     list<edgenode> l;
     g.edges.push_back(l);
@@ -77,13 +77,66 @@ void insert_edge(graph &g, int x, int y, bool directed, bool verbose) {
   return;
 }
 
-void print_graph(const graph &g, bool verbose) {
+void print_graph(const Graph &g, bool verbose) {
   for (auto i = 0; i < g.nvertices; i++) {
-    cout << i << ": ";
-    for (const auto &p : g.edges[i]) {
-      cout << " " << p.y;
+    if (g.edges[i].size() > 0) {
+      cout << i << ": ";
+      for (const auto &p : g.edges[i]) {
+        cout << " " << p.y;
+      }
+      cout << endl;
     }
-    cout << endl;
+  }
+  return;
+}
+
+void init_BFSInfo(BFSInfo &info) {
+  info.processed.clear();
+  info.discovered.clear();
+  info.parent.clear();
+  return;
+}
+
+void bfs(Graph &g, int start, BFSInfo &info,
+         std::function<void(int)> process_vertex_early,
+         std::function<void(int, int)> process_edge,
+         std::function<void(int)> process_vertex_late) {
+  // Initializing the information of the graph.
+  for (auto i = 0; i < g.nvertices; i++) {
+    info.processed.push_back(false);
+    info.discovered.push_back(false);
+    info.parent.push_back(-1);
+  }
+
+  // FIFO to store the nodes being discovered during the graph traversal.
+  queue<int> q;
+
+  q.push(start);
+  info.discovered[start] = true;
+
+  while (!q.empty()) {
+    auto u = q.front();
+    q.pop();
+    if (process_vertex_early != nullptr)
+      process_vertex_early(u);
+    // Setting to processed because we will visit all its edges before going to
+    // the next node.
+    info.processed[u] = true;
+
+    for (const auto &p : g.edges[u]) {
+      auto v = p.y;
+      if (!info.processed[v] || g.directed) {
+        if (process_edge != nullptr)
+          process_edge(u, v);
+      }
+      if (!info.discovered[v]) {
+        q.push(v);
+        info.discovered[v] = true;
+        info.parent[v] = u;
+      }
+    }
+    if (process_vertex_late != nullptr)
+      process_vertex_late(u);
   }
   return;
 }
