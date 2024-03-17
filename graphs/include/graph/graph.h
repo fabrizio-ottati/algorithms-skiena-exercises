@@ -8,7 +8,7 @@
 
 typedef int vertex_t;
 
-constexpr vertex_t ROOT_VERTEX = -1;
+constexpr vertex_t NO_PARENT = -1;
 
 // Data structure describing an edge in the Graph.
 typedef struct edgenode {

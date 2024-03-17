@@ -107,7 +107,7 @@ void bfs(Graph &g, vertex_t start, BFSInfo &info,
   for (auto i = 0; i < g.nvertices; i++) {
     info.processed.push_back(false);
     info.discovered.push_back(false);
-    info.parents.push_back(ROOT_VERTEX);
+    info.parents.push_back(NO_PARENT);
   }
 
   // FIFO to store the nodes being discovered during the graph traversal.
@@ -146,7 +146,7 @@ void bfs(Graph &g, vertex_t start, BFSInfo &info,
 // Recursive inner function to find the path between vertices.
 static void find_path_r(vector<vertex_t> &path, vertex_t start, vertex_t end,
                         const vector<vertex_t> &parents) {
-  if (start == end || end == ROOT_VERTEX) {
+  if (start == end || end == NO_PARENT) {
     path.push_back(start);
     return;
   }
@@ -158,7 +158,7 @@ static void find_path_r(vector<vertex_t> &path, vertex_t start, vertex_t end,
 
 vector<vertex_t> find_path(vertex_t start, vertex_t end,
                            const vector<vertex_t> &parents) {
-  if (parents[start] != ROOT_VERTEX) {
+  if (parents[start] != NO_PARENT) {
     cerr << "WARNING: The start vertex " << start << " is not a root one.\n"
          << endl;
   }
