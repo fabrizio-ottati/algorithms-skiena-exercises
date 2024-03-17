@@ -27,7 +27,8 @@ void read_graph(Graph &g, bool directed, const string &fpath, bool verbose) {
     throw runtime_error("ERROR: Could not open input file.");
   }
 
-  int m, x, y;
+  int m;
+  vertex_t x, y;
 
   initialize_graph(g, directed);
   if (!(ifs >> g.nvertices >> m)) {
@@ -51,7 +52,8 @@ void read_graph(Graph &g, bool directed, const string &fpath, bool verbose) {
   return;
 }
 
-void insert_edge(Graph &g, int x, int y, bool directed, bool verbose) {
+void insert_edge(Graph &g, vertex_t x, vertex_t y, bool directed,
+                 bool verbose) {
   // Initiliazing.
   edgenode p;
   p.weight = 0;
@@ -93,23 +95,23 @@ void print_graph(const Graph &g, bool verbose) {
 void init_BFSInfo(BFSInfo &info) {
   info.processed.clear();
   info.discovered.clear();
-  info.parent.clear();
+  info.parents.clear();
   return;
 }
 
-void bfs(Graph &g, int start, BFSInfo &info,
-         std::function<void(int)> process_vertex_early,
-         std::function<void(int, int)> process_edge,
-         std::function<void(int)> process_vertex_late) {
+void bfs(Graph &g, vertex_t start, BFSInfo &info,
+         std::function<void(vertex_t)> process_vertex_early,
+         std::function<void(vertex_t, vertex_t)> process_edge,
+         std::function<void(vertex_t)> process_vertex_late) {
   // Initializing the information of the graph.
   for (auto i = 0; i < g.nvertices; i++) {
     info.processed.push_back(false);
     info.discovered.push_back(false);
-    info.parent.push_back(-1);
+    info.parents.push_back(ROOT_VERTEX);
   }
 
   // FIFO to store the nodes being discovered during the graph traversal.
-  queue<int> q;
+  queue<vertex_t> q;
 
   q.push(start);
   info.discovered[start] = true;
@@ -132,11 +134,32 @@ void bfs(Graph &g, int start, BFSInfo &info,
       if (!info.discovered[v]) {
         q.push(v);
         info.discovered[v] = true;
-        info.parent[v] = u;
+        info.parents[v] = u;
       }
     }
     if (process_vertex_late != nullptr)
       process_vertex_late(u);
   }
   return;
+}
+
+// Recursive inner function to find the path between vertices.
+static void find_path_r(vector<vertex_t> &path, vertex_t start, vertex_t end,
+                        const vector<vertex_t> &parents) {
+  if (start == end || end == ROOT_VERTEX) {
+    path.push_back(start);
+    return;
+  }
+
+  find_path_r(path, start, parents[end], parents);
+  path.push_back(end);
+  return;
+}
+
+vector<vertex_t> find_path(vertex_t start, vertex_t end,
+                           const vector<vertex_t> &parents) {
+  vector<vertex_t> path;
+  path.clear();
+  find_path_r(path, start, end, parents);
+  return path;
 }
