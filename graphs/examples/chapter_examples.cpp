@@ -6,22 +6,22 @@
 using namespace std;
 
 void read_graph_example(const string &fpath) {
-  Graph G;
-  initialize_graph(G, false);
-  read_graph(G, false, fpath);
-  print_graph(G);
+  Graph<int> G;
+  initialize_graph<int>(G, false);
+  read_graph<int>(G, false, fpath);
+  print_graph<int>(G);
 }
 
 void bfs_example(const string &fpath, int startNode = 1) {
-  Graph G;
-  initialize_graph(G, false);
-  read_graph(G, false, fpath);
+  Graph<int> G;
+  initialize_graph<int>(G, false);
+  read_graph<int>(G, false, fpath);
   cout << "Here's the graph:" << endl;
-  print_graph(G);
+  print_graph<int>(G);
   cout << endl;
 
-  BFSInfo info;
-  bfs(G, startNode, info);
+  BFSInfo<int> info;
+  bfs<int>(G, startNode, info);
 
   cout << "Here's the parents relation of this graph starting from node " << 1
        << ":" << endl;
@@ -38,14 +38,14 @@ void bfs_example(const string &fpath, int startNode = 1) {
 }
 
 void find_path_example(const string &fpath) {
-  Graph G;
-  initialize_graph(G, false);
-  read_graph(G, G.directed, fpath);
-  BFSInfo info;
-  bfs(G, 1, info);
+  Graph<int> G;
+  initialize_graph<int>(G, false);
+  read_graph<int>(G, G.directed, fpath);
+  BFSInfo<int> info;
+  bfs<int>(G, 1, info);
   // Finding the shortest path between two nodes.
-  vertex_t start = 1, end = 6;
-  auto shortestPath = find_path(start, end, info.parents);
+  int start = 1, end = 6;
+  auto shortestPath = find_path<int>(start, end, info.parents);
   cout << "Here's the shortest path between " << start << " and " << end << ":"
        << endl;
   for (auto i = 0; i < shortestPath.size(); i++) {
