@@ -1,42 +1,74 @@
 #ifndef GRAPH_H_
 #define GRAPH_H_
 
-#include <functional>
-#include <list>
-#include <vector>
 #include <exception>
 #include <fstream>
+#include <functional>
 #include <iostream>
+#include <list>
 #include <queue>
 #include <string>
+#include <vector>
+
+namespace fab {
 
 constexpr int NO_PARENT = -1;
 
 // Data structure describing an edge in the graph.
-template <typename V>
-struct Edge {
-  V y;
+typedef struct {
   int weight;
-};
+  int v;
+} edge_t;
 
 // Data structure describing a Graph<V>.
 // Based on adjacency list.
-template<typename V>
-struct Graph {
-  std::vector<std::list<Edge<V>>> edges;
+template <typename V> struct Graph {
+  std::vector<std::list<edge_t>> edges;
+  std::vector<V> nodes;
   std::vector<int> degree;
   int nvertices;
   int nedges;
   bool directed;
 };
 
-template <typename V>
-struct BFSInfo {
+template <typename V> struct BFSInfo {
   std::vector<bool> processed;
   std::vector<bool> discovered;
   std::vector<V> parents;
 };
 
+template <typename V>
+void add_edge(Graph<V> &G, int u, int v, bool directed = false,
+              bool verbose = false) {
+
+  // Initiliazing.
+  edge_t e;
+  e.weight = 0;
+  e.v = v;
+
+  // Checking if the vertex is already in the Graph.
+  while (u >= G.edges.size()) {
+    std::list<edge_t> l;
+    G.edges.push_back(l);
+    G.degree.push_back(0);
+  }
+
+  // Inserting the new edge to the head of the list.
+  G.edges[u].push_front(e);
+  G.degree[u]++;
+
+  if (!directed) {
+    add_edge<V>(G, v, u, true);
+  } else {
+    G.nedges++;
+  }
+
+  return;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+#if 0
 template <typename V>
 void initialize_graph(Graph<V> &g, bool directed, bool verbose = false) {
   g.nvertices = 0;
@@ -53,7 +85,7 @@ void initialize_graph(Graph<V> &g, bool directed, bool verbose = false) {
 
 template <typename V>
 void read_graph(Graph<V> &g, bool directed, const std::string &fpath,
-                bool verbose = false){
+                bool verbose = false) {
   std::ifstream ifs(fpath);
   if (!ifs.is_open()) {
     throw std::runtime_error("ERROR: Could not open input file.");
@@ -68,14 +100,15 @@ void read_graph(Graph<V> &g, bool directed, const std::string &fpath,
   }
   if (verbose)
     std::cout << "The graph contains " << g.nvertices << " vertices and " << m
-         << " edges." << std::endl;
+              << " edges." << std::endl;
 
   for (auto i = 0; i < m; i++) {
     if (!(ifs >> x >> y)) {
       throw std::runtime_error("ERROR: Could not read from file.");
     }
     if (verbose)
-      std::cout << "Read the following edge: (" << x << ", " << y << ")." << std::endl;
+      std::cout << "Read the following edge: (" << x << ", " << y << ")."
+                << std::endl;
     insert_edge<V>(g, x, y, directed);
   }
 
@@ -85,8 +118,7 @@ void read_graph(Graph<V> &g, bool directed, const std::string &fpath,
 }
 
 template <typename V>
-void insert_edge(Graph<V> &g, V x, V y, bool directed,
-                 bool verbose = false) {
+void insert_edge(Graph<V> &g, V x, V y, bool directed, bool verbose = false) {
   // Initiliazing.
   Edge<V> e;
   e.weight = 0;
@@ -126,8 +158,7 @@ void print_graph(const Graph<V> &g, bool verbose = false) {
   return;
 }
 
-template <typename V>
-void init_BFSInfo(BFSInfo<V> &info) {
+template <typename V> void init_BFSInfo(BFSInfo<V> &info) {
   info.processed.clear();
   info.discovered.clear();
   info.parents.clear();
@@ -194,11 +225,11 @@ static void find_path_r(std::vector<V> &path, V start, V end,
 }
 
 template <typename V>
-std::vector<V> find_path(V start, V end,
-                                const std::vector<V> &parents) {
+std::vector<V> find_path(V start, V end, const std::vector<V> &parents) {
   if (parents[start] != NO_PARENT) {
-    std::cerr << "WARNING: The start vertex " << start << " is not a root one.\n"
-         << std::endl;
+    std::cerr << "WARNING: The start vertex " << start
+              << " is not a root one.\n"
+              << std::endl;
   }
 
   std::vector<V> path;
@@ -207,8 +238,7 @@ std::vector<V> find_path(V start, V end,
   return path;
 }
 
-template <typename V>
-std::vector<V> connected_components(Graph<V> &G) {
+template <typename V> std::vector<V> connected_components(Graph<V> &G) {
   BFSInfo<V> info;
   init_BFSInfo<V>(info);
 
@@ -222,5 +252,8 @@ std::vector<V> connected_components(Graph<V> &G) {
 
   return roots;
 }
+#endif
+
+} // namespace fab
 
 #endif // GRAPH_H_
